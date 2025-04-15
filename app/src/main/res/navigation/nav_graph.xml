@@ -1,18 +1,38 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mainFragment">
+    app:startDestination="@id/mainScreen">
 
     <fragment
-        android:id="@+id/mainFragment"
-        android:name="com.example.project_work.MainFragment" />
+        android:id="@+id/mainScreen"
+        android:name="com.example.project_work.ContentFragment">
+        <argument
+            android:name="layout_id"
+            app:argType="integer"
+            android:defaultValue="@layout/content_main" />
+    </fragment>
     <fragment
-        android:id="@+id/waterIntakeFragment"
-        android:name="com.example.project_work.WaterIntakeFragment" />
+        android:id="@+id/waterIntakeScreen"
+        android:name="com.example.project_work.ContentFragment">
+        <argument
+            android:name="layout_id"
+            app:argType="integer"
+            android:defaultValue="@layout/activity_water_intake" />
+    </fragment>
     <fragment
-        android:id="@+id/historyFragment"
-        android:name="com.example.project_work.HistoryFragment" />
+        android:id="@+id/historyScreen"
+        android:name="com.example.project_work.ContentFragment">
+        <argument
+            android:name="layout_id"
+            app:argType="integer"
+            android:defaultValue="@layout/activity_history" />
+    </fragment>
     <fragment
-        android:id="@+id/achievementsFragment"
-        android:name="com.example.project_work.AchievementsFragment" />
+        android:id="@+id/achievementsScreen"
+        android:name="com.example.project_work.ContentFragment">
+        <argument
+            android:name="layout_id"
+            app:argType="integer"
+            android:defaultValue="@layout/activity_achievements" />
+    </fragment>
 </navigation>

@@ -10,6 +10,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -20,21 +25,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate called");
 
-        Spinner genderSpinner = findViewById(R.id.spinner_gender);
-        EditText weightEdit = findViewById(R.id.edit_weight);
-        Button calculateButton = findViewById(R.id.btn_calculate);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupWithNavController(bottomNav, navController);
 
-        calculateButton.setOnClickListener(v -> {
-            String gender = genderSpinner.getSelectedItem().toString();
-            String weightStr = weightEdit.getText().toString();
-            if (!weightStr.isEmpty()) {
-                double weight = Double.parseDouble(weightStr);
-                double waterIntake = gender.equals("Male") ? weight * 35 : weight * 31;
-                Toast.makeText(this, "Daily water intake: " + waterIntake + " ml", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Enter weight", Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Start foreground service
+        startForegroundService(new Intent(this, WaterReminderService.class));
     }
 
 
@@ -88,6 +84,29 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.main_menu, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        if (id == R.id.menu_settings) {
+//            startActivity(new Intent(this, SettingsActivity.class));
+//            return true;
+//        } else if (id == R.id.menu_history) {
+//            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.historyScreen);
+//            return true;
+//        } else if (id == R.id.menu_achievements) {
+//            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.achievementsScreen);
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
 
 }
