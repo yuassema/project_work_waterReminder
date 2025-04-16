@@ -1,23 +1,37 @@
 package com.example.project_work;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+
+    // Лаунчер для запроса разрешения
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Разрешение получено, запускаем сервис
+                    startForegroundService(new Intent(this, WaterReminderService.class));
+                } else {
+                    Log.w(TAG, "POST_NOTIFICATIONS permission denied");
+                    // Можно показать пользователю сообщение, что уведомления не будут работать
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +43,21 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(bottomNav, navController);
 
-        // Start foreground service
-        startForegroundService(new Intent(this, WaterReminderService.class));
+        // Проверяем и запрашиваем разрешение POST_NOTIFICATIONS
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13 и выше
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Запрашиваем разрешение
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            } else {
+                // Разрешение уже есть, запускаем сервис
+                startForegroundService(new Intent(this, WaterReminderService.class));
+            }
+        } else {
+            // Для Android ниже 13 разрешение не требуется
+            startForegroundService(new Intent(this, WaterReminderService.class));
+        }
     }
-
 
     @Override
     protected void onStart() {
@@ -76,37 +101,14 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         } else if (id == R.id.menu_history) {
-            startActivity(new Intent(this, HistoryActivity.class));
+            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.historyScreen);
             return true;
         } else if (id == R.id.menu_achievements) {
-            startActivity(new Intent(this, AchievementsActivity.class));
+            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.achievementsScreen);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.main_menu, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//        if (id == R.id.menu_settings) {
-//            startActivity(new Intent(this, SettingsActivity.class));
-//            return true;
-//        } else if (id == R.id.menu_history) {
-//            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.historyScreen);
-//            return true;
-//        } else if (id == R.id.menu_achievements) {
-//            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.achievementsScreen);
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
 
 
 }
