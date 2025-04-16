@@ -1,5 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/glass_200" android:title="200 ml" />
-    <item android:id="@+id/glass_250" android:title="250 ml" />
-    <item android:id="@+id/glass_500" android:title="500 ml" />
+    <item
+        android:id="@+id/glass_200"
+        android:title="200 ml" />
+    <item
+        android:id="@+id/glass_250"
+        android:title="250 ml" />
+    <item
+        android:id="@+id/glass_500"
+        android:title="500 ml" />
 </menu>

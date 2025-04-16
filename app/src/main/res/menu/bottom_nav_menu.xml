@@ -1,6 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/mainFragment" android:title="Home" />
-    <item android:id="@+id/waterIntakeFragment" android:title="Intake" />
-    <item android:id="@+id/historyFragment" android:title="History" />
-    <item android:id="@+id/achievementsFragment" android:title="Achievements" />
+    <item
+        android:id="@+id/mainScreen"
+        android:title="Home" />
+    <item
+        android:id="@+id/waterIntakeScreen"
+        android:title="Intake" />
+    <item
+        android:id="@+id/historyScreen"
+        android:title="History" />
+    <item
+        android:id="@+id/achievementsScreen"
+        android:title="Achievements" />
 </menu>

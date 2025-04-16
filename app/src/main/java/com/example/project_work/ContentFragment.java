@@ -32,7 +32,6 @@ public class ContentFragment extends Fragment {
         int layoutId = getArguments() != null ? getArguments().getInt(ARG_LAYOUT) : R.layout.content_main;
         View view = inflater.inflate(layoutId, container, false);
 
-        // Handle UI based on layout
         if (layoutId == R.layout.content_main) {
             setupMainScreen(view);
         } else if (layoutId == R.layout.activity_water_intake) {

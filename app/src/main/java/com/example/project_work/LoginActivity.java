@@ -8,6 +8,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
+    private static final String DEFAULT_USERNAME = "admin";
+    private static final String DEFAULT_PASSWORD = "password123";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,6 +20,15 @@ public class LoginActivity extends AppCompatActivity {
         Button loginButton = findViewById(R.id.btn_login);
 
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+
+
+        if (!prefs.contains(DEFAULT_USERNAME)) {
+
+            prefs.edit().putString(DEFAULT_USERNAME, DEFAULT_PASSWORD).apply();
+        }
+
+        usernameEdit.setHint("Username (default: " + DEFAULT_USERNAME + ")");
+        passwordEdit.setHint("Password (default: " + DEFAULT_PASSWORD + ")");
 
         loginButton.setOnClickListener(v -> {
             String username = usernameEdit.getText().toString();
