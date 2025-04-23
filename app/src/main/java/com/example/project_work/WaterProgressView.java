@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -30,12 +31,21 @@ public class WaterProgressView extends View {
         float radius = Math.min(centerX, centerY) - 20;
 
         // Draw background circle
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawCircle(centerX, centerY, radius, paint);
+
+        // Draw outer gray ring
         paint.setColor(Color.LTGRAY);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(10);
         canvas.drawCircle(centerX, centerY, radius, paint);
 
         // Draw progress arc
         paint.setColor(Color.BLUE);
-        canvas.drawArc(centerX - radius, centerY - radius, centerX + radius, centerY + radius,
-                -90, (progress / 100) * 360, true, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(10);
+        RectF oval = new RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+        canvas.drawArc(oval, -90, (progress / 100) * 360, false, paint);
     }
 }

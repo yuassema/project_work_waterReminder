@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">project_work</string>
+    <string name="time_to_drink">It\'s time to drink your first glass of water!</string>
+    <string name="daily_goal">Daily goal</string>
+    <string name="confirm_drank">Confirm that you just drank the recommended amount</string>
+    <string name="history">History</string>
 </resources>

@@ -25,7 +25,7 @@ public class WaterIntakeAdapter extends RecyclerView.Adapter<WaterIntakeAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         WaterIntake intake = waterIntakes.get(position);
-        holder.dateText.setText(intake.getDate());
+        holder.timeText.setText(intake.getTime()); // Changed from date to time
         holder.volumeText.setText(intake.getVolume() + " ml");
         holder.progressText.setText(String.format("%.0f%%", intake.getProgress()));
         holder.waterIcon.setImageResource(R.drawable.ic_water);
@@ -37,12 +37,12 @@ public class WaterIntakeAdapter extends RecyclerView.Adapter<WaterIntakeAdapter.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView dateText, volumeText, progressText;
+        TextView timeText, volumeText, progressText;
         ImageView waterIcon;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            dateText = itemView.findViewById(R.id.text_date);
+            timeText = itemView.findViewById(R.id.text_date); // Reusing the same ID
             volumeText = itemView.findViewById(R.id.text_volume);
             progressText = itemView.findViewById(R.id.text_progress);
             waterIcon = itemView.findViewById(R.id.image_water);

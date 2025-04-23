@@ -8,7 +8,7 @@
         android:name="com.example.project_work.ContentFragment">
         <argument
             android:name="layout_id"
-            app:argType="integer"
+            app:argType="reference"
             android:defaultValue="@layout/content_main" />
     </fragment>
     <fragment
@@ -16,7 +16,7 @@
         android:name="com.example.project_work.ContentFragment">
         <argument
             android:name="layout_id"
-            app:argType="integer"
+            app:argType="reference"
             android:defaultValue="@layout/activity_water_intake" />
     </fragment>
     <fragment
@@ -24,7 +24,7 @@
         android:name="com.example.project_work.ContentFragment">
         <argument
             android:name="layout_id"
-            app:argType="integer"
+            app:argType="reference"
             android:defaultValue="@layout/activity_history" />
     </fragment>
     <fragment
@@ -32,7 +32,7 @@
         android:name="com.example.project_work.ContentFragment">
         <argument
             android:name="layout_id"
-            app:argType="integer"
+            app:argType="reference"
             android:defaultValue="@layout/activity_achievements" />
     </fragment>
 </navigation>
