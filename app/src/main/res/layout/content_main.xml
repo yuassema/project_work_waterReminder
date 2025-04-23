@@ -78,7 +78,7 @@
                 <ImageView
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:src="@drawable/ic_water_drop_character"
+                    android:src="@drawable/axolotl"
                     android:layout_marginEnd="8dp" />
 
                 <TextView

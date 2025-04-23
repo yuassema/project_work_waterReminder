@@ -4,4 +4,9 @@
     <string name="daily_goal">Daily goal</string>
     <string name="confirm_drank">Confirm that you just drank the recommended amount</string>
     <string name="history">History</string>
+    <string name="intake_at">Прием в %s</string>
+    <string name="cancel">ОТМЕНА</string>
+    <string name="ok">ОК</string>
+    <string name="edit">Редактировать</string>
+    <string name="delete">Удалить</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.project_work;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -21,12 +22,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class ContentFragment extends Fragment {
+public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnItemActionListener {
     private static final String ARG_LAYOUT = "layout_id";
-    private int dailyGoal = 0; // Will be calculated based on weight and gender
+    private int dailyGoal = 0;
     private float currentProgress = 0;
     private List<WaterIntake> intakes = new ArrayList<>();
     private WaterIntakeAdapter adapter;
+    private TextView textProgressMl;
+    private WaterProgressView progressView;
 
     public static ContentFragment newInstance(int layoutId) {
         ContentFragment fragment = new ContentFragment();
@@ -63,15 +66,15 @@ public class ContentFragment extends Fragment {
 
         // Progress Section
         View progressSection = view.findViewById(R.id.progress_section);
-        TextView textProgressMl = view.findViewById(R.id.text_progress_ml);
-        WaterProgressView progressView = view.findViewById(R.id.water_progress_view);
+        textProgressMl = view.findViewById(R.id.text_progress_ml);
+        progressView = view.findViewById(R.id.water_progress_view);
         ImageButton addGlassButton = view.findViewById(R.id.btn_add_glass);
         ImageButton resetButton = view.findViewById(R.id.btn_reset);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_history_main);
 
         // Initialize RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new WaterIntakeAdapter(intakes);
+        adapter = new WaterIntakeAdapter(intakes, this);
         recyclerView.setAdapter(adapter);
 
         // Calculate Button Listener
@@ -88,7 +91,7 @@ public class ContentFragment extends Fragment {
                 progressSection.setVisibility(View.VISIBLE);
 
                 // Update progress bar with the new goal
-                updateProgress(textProgressMl, progressView);
+                updateProgress();
             } else {
                 Toast.makeText(getContext(), "Enter weight", Toast.LENGTH_SHORT).show();
             }
@@ -113,7 +116,7 @@ public class ContentFragment extends Fragment {
                 adapter.notifyItemInserted(0);
                 recyclerView.scrollToPosition(0);
 
-                updateProgress(textProgressMl, progressView);
+                updateProgress();
                 Toast.makeText(getContext(), "Added " + volume + " ml", Toast.LENGTH_SHORT).show();
                 return true;
             });
@@ -125,15 +128,94 @@ public class ContentFragment extends Fragment {
             currentProgress = 0;
             intakes.clear();
             adapter.notifyDataSetChanged();
-            updateProgress(textProgressMl, progressView);
+            updateProgress();
             Toast.makeText(getContext(), "Progress reset", Toast.LENGTH_SHORT).show();
         });
     }
 
-    private void updateProgress(TextView textProgressMl, WaterProgressView progressView) {
+    private void updateProgress() {
         int currentMl = (int) (currentProgress * dailyGoal / 100);
         textProgressMl.setText(currentMl + "/" + dailyGoal + "ml");
         progressView.setProgress(currentProgress);
+    }
+
+    @Override
+    public void onEdit(int position) {
+        WaterIntake intake = intakes.get(position);
+        Dialog dialog = new Dialog(getContext());
+        dialog.setContentView(R.layout.dialog_edit_water);
+
+        TextView title = dialog.findViewById(R.id.text_dialog_title);
+        title.setText("Intake at " + intake.getTime());
+
+        Button btn50ml = dialog.findViewById(R.id.btn_50ml);
+        Button btn100ml = dialog.findViewById(R.id.btn_100ml);
+        Button btn150ml = dialog.findViewById(R.id.btn_150ml);
+        Button btn200ml = dialog.findViewById(R.id.btn_200ml);
+        Button btnCancel = dialog.findViewById(R.id.btn_cancel);
+        Button btnOk = dialog.findViewById(R.id.btn_ok);
+
+        final int[] newVolume = {intake.getVolume()};
+        // Set the initially selected button based on the current volume
+        if (newVolume[0] == 50) btn50ml.setSelected(true);
+        else if (newVolume[0] == 100) btn100ml.setSelected(true);
+        else if (newVolume[0] == 150) btn150ml.setSelected(true);
+        else if (newVolume[0] == 200) btn200ml.setSelected(true);
+
+        View.OnClickListener volumeClickListener = v -> {
+            btn50ml.setSelected(false);
+            btn100ml.setSelected(false);
+            btn150ml.setSelected(false);
+            btn200ml.setSelected(false);
+            v.setSelected(true);
+
+            if (v.getId() == R.id.btn_50ml) newVolume[0] = 50;
+            else if (v.getId() == R.id.btn_100ml) newVolume[0] = 100;
+            else if (v.getId() == R.id.btn_150ml) newVolume[0] = 150;
+            else if (v.getId() == R.id.btn_200ml) newVolume[0] = 200;
+        };
+
+        btn50ml.setOnClickListener(volumeClickListener);
+        btn100ml.setOnClickListener(volumeClickListener);
+        btn150ml.setOnClickListener(volumeClickListener);
+        btn200ml.setOnClickListener(volumeClickListener);
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnOk.setOnClickListener(v -> {
+            // Recalculate progress by removing the old volume and adding the new one
+            int oldVolume = intake.getVolume();
+            currentProgress -= (oldVolume * 100.0f) / dailyGoal;
+            currentProgress += (newVolume[0] * 100.0f) / dailyGoal;
+            if (currentProgress > 100) currentProgress = 100;
+            if (currentProgress < 0) currentProgress = 0;
+
+            // Update the intake entry
+            intake.setVolume(newVolume[0]);
+            intake.setProgress(currentProgress);
+            intakes.set(position, intake);
+            adapter.notifyItemChanged(position);
+
+            // Update the progress bar
+            updateProgress();
+
+            Toast.makeText(getContext(), "Updated to " + newVolume[0] + " ml", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
+    @Override
+    public void onDelete(int position) {
+        WaterIntake intake = intakes.get(position);
+        currentProgress -= (intake.getVolume() * 100.0f) / dailyGoal;
+        if (currentProgress < 0) currentProgress = 0;
+
+        intakes.remove(position);
+        adapter.notifyItemRemoved(position);
+
+        updateProgress();
+        Toast.makeText(getContext(), "Entry deleted", Toast.LENGTH_SHORT).show();
     }
 
     private void setupWaterIntakeScreen(View view) {
@@ -144,8 +226,8 @@ public class ContentFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.recycler_history);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         List<WaterIntake> historyIntakes = new ArrayList<>();
-        historyIntakes.add(new WaterIntake("2025-04-14", 500, 25)); // Sample data
-        recyclerView.setAdapter(new WaterIntakeAdapter(historyIntakes));
+        historyIntakes.add(new WaterIntake("2025-04-14", 500, 25));
+        recyclerView.setAdapter(new WaterIntakeAdapter(historyIntakes, this));
     }
 
     private void setupAchievementsScreen(View view) {

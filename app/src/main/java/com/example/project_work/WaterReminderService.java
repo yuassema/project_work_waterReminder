@@ -27,7 +27,7 @@ public class WaterReminderService extends Service {
         Notification notification = new NotificationCompat.Builder(this, "water_reminder")
                 .setContentTitle("Time to drink water!")
                 .setContentText("Drink 250 ml to stay hydrated.")
-                .setSmallIcon(R.drawable.ic_water)
+                .setSmallIcon(R.drawable.water)
                 .build();
 
         startForeground(NOTIFICATION_ID, notification);

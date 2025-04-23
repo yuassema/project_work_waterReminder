@@ -48,6 +48,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
         android:text="Add Water"
-        android:drawableStart="@drawable/ic_water"
+        android:drawableStart="@drawable/water"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 </RelativeLayout>

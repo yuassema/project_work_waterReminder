@@ -1,7 +1,7 @@
 package com.example.project_work;
 
 public class WaterIntake {
-    private String time; // Changed from date to time for main screen
+    private String time;
     private int volume;
     private float progress;
 
@@ -15,11 +15,23 @@ public class WaterIntake {
         return time;
     }
 
+    public void setTime(String time) {
+        this.time = time;
+    }
+
     public int getVolume() {
         return volume;
     }
 
+    public void setVolume(int volume) {
+        this.volume = volume;
+    }
+
     public float getProgress() {
         return progress;
+    }
+
+    public void setProgress(float progress) {
+        this.progress = progress;
     }
 }
