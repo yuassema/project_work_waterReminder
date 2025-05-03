@@ -31,6 +31,7 @@ android {
     }
 }
 
+
 dependencies {
 
     implementation(libs.appcompat)
@@ -43,6 +44,8 @@ dependencies {
     implementation ("androidx.navigation:navigation-fragment:2.7.7")
     implementation ("androidx.navigation:navigation-ui:2.7.7")
     implementation ("androidx.room:room-runtime:2.7.0")
+    implementation ("com.google.android.material:material:1.9.0")
+    implementation ("androidx.cardview:cardview:1.0.0")
     annotationProcessor ("androidx.room:room-compiler:2.7.0")
     implementation ("com.google.android.material:material:1.12.0")
     testImplementation(libs.junit)

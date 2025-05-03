@@ -2,10 +2,13 @@ package com.example.project_work;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -57,6 +60,8 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
         return view;
     }
 
+
+
     private void setupMainScreen(View view) {
         // Input Section
         Spinner genderSpinner = view.findViewById(R.id.spinner_gender);
@@ -76,6 +81,9 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new WaterIntakeAdapter(intakes, this);
         recyclerView.setAdapter(adapter);
+
+        // Регистрация RecyclerView для Context Menu
+        registerForContextMenu(recyclerView);
 
         // Calculate Button Listener
         calculateButton.setOnClickListener(v -> {
@@ -141,12 +149,12 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
 
     @Override
     public void onEdit(int position) {
-        WaterIntake intake = intakes.get(position);
+        final WaterIntake[] intake = {intakes.get(position)};
         Dialog dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.dialog_edit_water);
 
         TextView title = dialog.findViewById(R.id.text_dialog_title);
-        title.setText("Intake at " + intake.getTime());
+        title.setText("Intake at " + intake[0].getTime());
 
         Button btn50ml = dialog.findViewById(R.id.btn_50ml);
         Button btn100ml = dialog.findViewById(R.id.btn_100ml);
@@ -155,45 +163,25 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
         Button btnCancel = dialog.findViewById(R.id.btn_cancel);
         Button btnOk = dialog.findViewById(R.id.btn_ok);
 
-        final int[] newVolume = {intake.getVolume()};
-        // Set the initially selected button based on the current volume
-        if (newVolume[0] == 50) btn50ml.setSelected(true);
-        else if (newVolume[0] == 100) btn100ml.setSelected(true);
-        else if (newVolume[0] == 150) btn150ml.setSelected(true);
-        else if (newVolume[0] == 200) btn200ml.setSelected(true);
-
-        View.OnClickListener volumeClickListener = v -> {
-            btn50ml.setSelected(false);
-            btn100ml.setSelected(false);
-            btn150ml.setSelected(false);
-            btn200ml.setSelected(false);
-            v.setSelected(true);
-
-            if (v.getId() == R.id.btn_50ml) newVolume[0] = 50;
-            else if (v.getId() == R.id.btn_100ml) newVolume[0] = 100;
-            else if (v.getId() == R.id.btn_150ml) newVolume[0] = 150;
-            else if (v.getId() == R.id.btn_200ml) newVolume[0] = 200;
-        };
-
-        btn50ml.setOnClickListener(volumeClickListener);
-        btn100ml.setOnClickListener(volumeClickListener);
-        btn150ml.setOnClickListener(volumeClickListener);
-        btn200ml.setOnClickListener(volumeClickListener);
+        final int[] newVolume = {intake[0].getVolume()};
+        btn50ml.setOnClickListener(v -> newVolume[0] = 50);
+        btn100ml.setOnClickListener(v -> newVolume[0] = 100);
+        btn150ml.setOnClickListener(v -> newVolume[0] = 150);
+        btn200ml.setOnClickListener(v -> newVolume[0] = 200);
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
         btnOk.setOnClickListener(v -> {
             // Recalculate progress by removing the old volume and adding the new one
-            int oldVolume = intake.getVolume();
+            int oldVolume = intake[0].getVolume();
             currentProgress -= (oldVolume * 100.0f) / dailyGoal;
             currentProgress += (newVolume[0] * 100.0f) / dailyGoal;
             if (currentProgress > 100) currentProgress = 100;
             if (currentProgress < 0) currentProgress = 0;
 
             // Update the intake entry
-            intake.setVolume(newVolume[0]);
-            intake.setProgress(currentProgress);
-            intakes.set(position, intake);
+            intake[0] = new WaterIntake(intake[0].getTime(), newVolume[0], currentProgress);
+            intakes.set(position, intake[0]);
             adapter.notifyItemChanged(position);
 
             // Update the progress bar
@@ -205,6 +193,7 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
 
         dialog.show();
     }
+
     @Override
     public void onDelete(int position) {
         WaterIntake intake = intakes.get(position);
@@ -217,6 +206,8 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
         updateProgress();
         Toast.makeText(getContext(), "Entry deleted", Toast.LENGTH_SHORT).show();
     }
+
+
 
     private void setupWaterIntakeScreen(View view) {
         // Keep existing logic or update as needed
@@ -232,5 +223,34 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
 
     private void setupAchievementsScreen(View view) {
         // Add achievements logic if needed
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.recycler_history_main || v.getId() == R.id.recycler_history) {
+            getActivity().getMenuInflater().inflate(R.menu.item_actions_menu, menu);
+            menu.setHeaderTitle("Select Action");
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        // Получаем позицию из тега элемента
+        View view = item.getActionView();
+        if (view != null) {
+            Integer position = (Integer) view.getTag();
+            if (position != null && position >= 0 && position < intakes.size()) {
+                int id = item.getItemId();
+                if (id == R.id.action_edit) {
+                    onEdit(position);
+                    return true;
+                } else if (id == R.id.action_delete) {
+                    onDelete(position);
+                    return true;
+                }
+            }
+        }
+        return super.onContextItemSelected(item);
     }
 }

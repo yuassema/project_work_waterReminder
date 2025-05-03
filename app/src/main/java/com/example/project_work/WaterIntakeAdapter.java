@@ -39,6 +39,15 @@ public class WaterIntakeAdapter extends RecyclerView.Adapter<WaterIntakeAdapter.
         holder.progressText.setText(String.format("%.0f%%", intake.getProgress()));
         holder.waterIcon.setImageResource(R.drawable.water);
 
+        // Обработка долгого нажатия для вызова Context Menu
+        holder.itemView.setOnLongClickListener(v -> {
+            // Сохраняем позицию в теге элемента
+            holder.itemView.setTag(position);
+            // Показываем контекстное меню
+            v.showContextMenu();
+            return true;
+        });
+
         holder.moreButton.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(v.getContext(), holder.moreButton);
             popup.getMenuInflater().inflate(R.menu.item_actions_menu, popup.getMenu());

@@ -1,68 +1,41 @@
 package com.example.project_work;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class LoginActivity extends AppCompatActivity {
-    private static final String DEFAULT_USERNAME = "admin";
-    private static final String DEFAULT_PASSWORD = "123";
-    private static final String PREF_NAME = "user_prefs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        EditText usernameEdit = findViewById(R.id.edit_username);
-        EditText passwordEdit = findViewById(R.id.edit_password);
-        Button loginButton = findViewById(R.id.btn_login);
+        // Получаем TextInputEditText напрямую по их ID
+        TextInputEditText etUsername = findViewById(R.id.et_username);
+        TextInputEditText etPassword = findViewById(R.id.et_password);
 
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        // Получаем кнопки (используем MaterialButton для совместимости)
+        com.google.android.material.button.MaterialButton btnLogin = findViewById(R.id.btn_login);
+        com.google.android.material.button.MaterialButton btnSignup = findViewById(R.id.btn_signup);
 
-//        prefs.edit().clear().apply();
-//        Log.d("LOGIN", "SharedPreferences cleared");
+        btnLogin.setOnClickListener(v -> {
+            String username = etUsername.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
 
-// При первом запуске — создаём пользователя admin:123
-        if (!prefs.contains(DEFAULT_USERNAME)) {
-            prefs.edit().putString(DEFAULT_USERNAME, DEFAULT_PASSWORD).apply();
-            Log.d("LOGIN", "Default user created: admin/123");
-        }
-
-        usernameEdit.setHint("Username (default: admin)");
-        passwordEdit.setHint("Password (default: 123)");
-
-        loginButton.setOnClickListener(v -> {
-            String username = usernameEdit.getText().toString().trim();
-            String password = passwordEdit.getText().toString().trim();
-
-            if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Username and password can't be empty", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            String savedPassword = prefs.getString(username, null);
-
-            Log.d("LOGIN", "Input: " + username + " / " + password);
-            Log.d("LOGIN", "Saved: " + savedPassword);
-
-            if (savedPassword == null) {
-                // Новый пользователь — регистрируем
-                prefs.edit().putString(username, password).apply();
-                Toast.makeText(this, "New user registered", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, MainActivity.class));
-            } else if (savedPassword.equals(password)) {
-                Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, MainActivity.class));
+            if (username.equals("admin") && password.equals("123")) {
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
             } else {
-                Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        btnSignup.setOnClickListener(v -> {
+            Toast.makeText(LoginActivity.this, "Signup feature to be implemented", Toast.LENGTH_SHORT).show();
         });
     }
 }
