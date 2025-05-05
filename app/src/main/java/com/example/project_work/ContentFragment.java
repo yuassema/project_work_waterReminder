@@ -60,8 +60,6 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
         return view;
     }
 
-
-
     private void setupMainScreen(View view) {
         // Input Section
         Spinner genderSpinner = view.findViewById(R.id.spinner_gender);
@@ -82,7 +80,7 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
         adapter = new WaterIntakeAdapter(intakes, this);
         recyclerView.setAdapter(adapter);
 
-        // Регистрация RecyclerView для Context Menu
+        // Register RecyclerView for Context Menu
         registerForContextMenu(recyclerView);
 
         // Calculate Button Listener
@@ -111,16 +109,24 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
             popup.getMenuInflater().inflate(R.menu.glass_menu, popup.getMenu());
             popup.setOnMenuItemClickListener(item -> {
                 int volume;
-                if (item.getItemId() == R.id.glass_200) volume = 200;
-                else if (item.getItemId() == R.id.glass_250) volume = 250;
-                else volume = 500;
+                int drawableId;
+                if (item.getItemId() == R.id.glass_200) {
+                    volume = 200;
+                    drawableId = R.drawable.water_200ml;
+                } else if (item.getItemId() == R.id.glass_250) {
+                    volume = 250;
+                    drawableId = R.drawable.water;
+                } else {
+                    volume = 500;
+                    drawableId = R.drawable.water_500ml;
+                }
 
                 currentProgress += (volume * 100.0f) / dailyGoal;
                 if (currentProgress > 100) currentProgress = 100;
 
                 // Add to history
                 String time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-                intakes.add(0, new WaterIntake(time, volume, currentProgress));
+                intakes.add(0, new WaterIntake(time, volume, currentProgress, drawableId));
                 adapter.notifyItemInserted(0);
                 recyclerView.scrollToPosition(0);
 
@@ -164,10 +170,23 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
         Button btnOk = dialog.findViewById(R.id.btn_ok);
 
         final int[] newVolume = {intake[0].getVolume()};
-        btn50ml.setOnClickListener(v -> newVolume[0] = 50);
-        btn100ml.setOnClickListener(v -> newVolume[0] = 100);
-        btn150ml.setOnClickListener(v -> newVolume[0] = 150);
-        btn200ml.setOnClickListener(v -> newVolume[0] = 200);
+        final int[] newDrawableId = {intake[0].getDrawableId()};
+        btn50ml.setOnClickListener(v -> {
+            newVolume[0] = 50;
+            newDrawableId[0] = R.drawable.water; // Default image for non-standard volume
+        });
+        btn100ml.setOnClickListener(v -> {
+            newVolume[0] = 100;
+            newDrawableId[0] = R.drawable.water; // Default image for non-standard volume
+        });
+        btn150ml.setOnClickListener(v -> {
+            newVolume[0] = 150;
+            newDrawableId[0] = R.drawable.water; // Default image for non-standard volume
+        });
+        btn200ml.setOnClickListener(v -> {
+            newVolume[0] = 200;
+            newDrawableId[0] = R.drawable.water_200ml;
+        });
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
@@ -180,7 +199,7 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
             if (currentProgress < 0) currentProgress = 0;
 
             // Update the intake entry
-            intake[0] = new WaterIntake(intake[0].getTime(), newVolume[0], currentProgress);
+            intake[0] = new WaterIntake(intake[0].getTime(), newVolume[0], currentProgress, newDrawableId[0]);
             intakes.set(position, intake[0]);
             adapter.notifyItemChanged(position);
 
@@ -207,8 +226,6 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
         Toast.makeText(getContext(), "Entry deleted", Toast.LENGTH_SHORT).show();
     }
 
-
-
     private void setupWaterIntakeScreen(View view) {
         // Keep existing logic or update as needed
     }
@@ -217,7 +234,7 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
         RecyclerView recyclerView = view.findViewById(R.id.recycler_history);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         List<WaterIntake> historyIntakes = new ArrayList<>();
-        historyIntakes.add(new WaterIntake("2025-04-14", 500, 25));
+        historyIntakes.add(new WaterIntake("2025-04-14", 500, 25, R.drawable.water_500ml));
         recyclerView.setAdapter(new WaterIntakeAdapter(historyIntakes, this));
     }
 
@@ -236,7 +253,7 @@ public class ContentFragment extends Fragment implements WaterIntakeAdapter.OnIt
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        // Получаем позицию из тега элемента
+        // Get position from the item's tag
         View view = item.getActionView();
         if (view != null) {
             Integer position = (Integer) view.getTag();

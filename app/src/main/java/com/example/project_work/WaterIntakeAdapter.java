@@ -37,13 +37,13 @@ public class WaterIntakeAdapter extends RecyclerView.Adapter<WaterIntakeAdapter.
         holder.timeText.setText(intake.getTime());
         holder.volumeText.setText(intake.getVolume() + " ml");
         holder.progressText.setText(String.format("%.0f%%", intake.getProgress()));
-        holder.waterIcon.setImageResource(R.drawable.water);
+        holder.waterIcon.setImageResource(intake.getDrawableId());
 
-        // Обработка долгого нажатия для вызова Context Menu
+        // Handle long click for Context Menu
         holder.itemView.setOnLongClickListener(v -> {
-            // Сохраняем позицию в теге элемента
+            // Save position in the view's tag
             holder.itemView.setTag(position);
-            // Показываем контекстное меню
+            // Show context menu
             v.showContextMenu();
             return true;
         });

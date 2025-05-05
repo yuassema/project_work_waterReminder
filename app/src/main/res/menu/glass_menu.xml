@@ -1,11 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/glass_200"
-        android:title="200 ml" />
+        android:title="200 ml"
+        android:icon="@drawable/water_200ml" />
     <item
         android:id="@+id/glass_250"
-        android:title="250 ml" />
+        android:title="250 ml"
+        android:icon="@drawable/water" />
     <item
         android:id="@+id/glass_500"
-        android:title="500 ml" />
+        android:title="500 ml"
+        android:icon="@drawable/water_500ml" />
 </menu>
